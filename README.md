@@ -1,103 +1,67 @@
 # EasyFit — Landing Page
 
-The marketing / download page for **EasyFit**, an AI nutrition tracker built as a
-4th-semester project at Technische Hochschule Augsburg (Faculty of Computer Science, SS 2026).
+A single-page, bilingual (German / English) marketing site for **EasyFit**, the AI-powered nutrition tracker built as a 4th-semester project at the Technische Hochschule Augsburg (Faculty of Computer Science, SS 2026).
 
-Snap a photo of a meal → the AI estimates its nutrition. Mensa meals log in two taps.
+The page lets visitors learn about the app and download the Android APK directly, since EasyFit is not on the Google Play Store yet.
 
-**Live site:** `https://<your-username>.github.io/<repo-name>/`
-(fill this in once GitHub Pages is enabled — see below)
+## Files
 
----
+| File | Purpose |
+|------|---------|
+| `easyfit.html` | The complete landing page — HTML, CSS, and JavaScript in one file. |
+| `easyfit-screenshot.jpg` | The dashboard screenshot shown inside the phone mockup. |
+| `README.md` | This file. |
 
-## Folder structure
+Both `easyfit.html` and `easyfit-screenshot.jpg` must stay in the **same folder** — the page loads the image by relative path (`src="easyfit-screenshot.jpg"`).
 
-Everything lives in the **root** of the repository — no subfolders:
+## Before you publish — fill in 3 placeholders
 
-```
-your-repo/
-├── index.html              ← the landing page (must be named exactly this)
-├── easyfit-screenshot.jpg  ← the phone screenshot shown in the hero
-├── easyfit.apk             ← the Android app (YOU upload this — see step 2)
-└── README.md               ← this file
-```
+Open `easyfit.html` in any text editor and replace these:
 
-That's it. Three files plus the README. Keep all filenames **lowercase and exactly
-as written** — GitHub Pages is case-sensitive, so `EasyFit.APK` will not match the
-`easyfit.apk` link in the page.
+1. **`REPLACE_WITH_APK_URL`** — the direct link to your hosted `.apk` file (the download button). Appears once.
+2. **`REPLACE_WITH_TESTFLIGHT_URL`** — your iOS TestFlight invite link. If you don't have one yet, you can delete the whole `<a ... class="dl-btn ios">...</a>` block instead.
+3. **`REPLACE_WITH_EMAIL`** — a contact email for the team. This one appears **twice** (once in the German text, once in the English text), so search for all occurrences.
 
----
+> Tip: a quick "Find & Replace All" in your editor handles each placeholder in one go.
 
-## How to publish it (GitHub Pages, free)
+## Languages (DE / EN)
 
-### 1. Create the repository
-- On github.com, click **New** to create a repository.
-- Give it a name (this becomes part of your URL).
-- Set it to **Public** (Pages is free for public repos).
-- Create it.
+The page is fully bilingual and chooses a language automatically:
 
-### 2. Upload the files
-- In the repo, click **Add file → Upload files**.
-- Drag in `index.html`, `easyfit-screenshot.jpg`, `README.md`, **and your `easyfit.apk`**.
-- Click **Commit changes**.
+- On first visit it reads the visitor's browser language. **German browser → German**, anything else → **English**.
+- **DE / EN** buttons in the top navigation switch the language instantly.
+- The chosen language is remembered (via `localStorage`) so a manual choice sticks on the next visit.
 
-> The APK must be named exactly `easyfit.apk`. The download button in the page links
-> to that filename. If you name the file differently, the button will 404.
+### Editing or adding text
 
-### 3. Turn on GitHub Pages
-- Go to **Settings → Pages** (left sidebar).
-- Under **Build and deployment → Source**, choose **Deploy from a branch**.
-- Branch: **main**, folder: **/ (root)**. Click **Save**.
-- Wait ~1–2 minutes, refresh, and the live URL appears at the top of that section.
+All text lives in a single dictionary in the `<script>` block near the bottom of the file, under the `I18N` object with `de` and `en` sections. Each piece of text has a key (e.g. `hero.sub`). To change wording, edit the value for that key in **both** languages. The matching element in the HTML carries the same key via a `data-i18n` attribute, so the two stay linked.
 
-Open the URL — your page is live, and the **Android APK** button downloads `easyfit.apk`.
+The default-language text is also written directly into the HTML, so the page still reads correctly even if JavaScript is disabled.
 
----
+## How to deploy
 
-## Important: the 100 MB file limit
+The site is fully static — no build step, no server-side code. Any static host works:
 
-GitHub blocks individual files over **100 MB**. Android APKs can exceed this.
+- **GitHub Pages** — push both files to a repo and enable Pages.
+- **Netlify / Vercel / Cloudflare Pages** — drag the folder into the dashboard.
+- **University web space** — upload both files via FTP/SFTP into the same directory.
 
-- **Under 100 MB** → just upload it to the repo as described above. Nothing else to do.
-- **Over 100 MB** → don't put it in the repo. Instead:
-  1. Go to your repo's **Releases** → **Create a new release** (Releases allow files up to 2 GB).
-  2. Attach `easyfit.apk` as a release asset and publish.
-  3. Copy the download link of the attached file.
-  4. In `index.html`, find the Android button (`href="easyfit.apk"`) and replace it
-     with that full release URL.
+Then host the `.apk` somewhere downloadable (the same host, a release attachment, or cloud storage) and point `REPLACE_WITH_APK_URL` at it.
 
----
+## Installing the APK (for visitors)
 
-## Editing things later
+Because the app isn't on the Play Store, Android will warn before installing an app from outside the store. Visitors tap **Install anyway** to continue. The page already explains this in the small print under the download buttons.
 
-A few placeholders are left for the team to fill in:
+## Tech notes
 
-| What | Where in `index.html` | Current value |
-|------|------------------------|---------------|
-| Contact email | search for `mailto:` | `easyfit-team@example.com` |
-| iOS / TestFlight | the second download button | disabled until iOS is ready |
+- Plain HTML + CSS + a small vanilla-JavaScript snippet for the language switch. No frameworks or dependencies.
+- Fonts (Fraunces + Plus Jakarta Sans) are loaded from Google Fonts and require an internet connection to display as designed; the page falls back to system fonts otherwise.
+- Responsive down to mobile, with keyboard focus styles and reduced-motion support.
 
-To change the contact email, edit the `mailto:` address. To enable the TestFlight
-button later, replace its `href="#download"` with your real TestFlight URL and remove
-the `onclick="return false;"` and the inline `style`.
+## Credits
 
----
+**Team:** Ahmed Somida · Yousif Abdelaziz · Mahmoud Abdelazim · Ammar Altantawy · Moustafa Ahmed · Nazanin Moradi · Raphael Maringgele
 
-## Custom domain (optional)
+**Supervisor:** Prof. Dr. Jens Lauterbach
 
-The free `github.io` address works forever. If you later want something like
-`easyfit.app`:
-1. Buy the domain from a registrar (Cloudflare, Porkbun, Namecheap — roughly €10–15/year).
-2. In **Settings → Pages → Custom domain**, enter the domain and follow the DNS steps shown.
-
-Hosting stays free — you'd only pay for the domain.
-
----
-
-## The team
-
-Ahmed Somida · Yousif Abdelaziz · Mahmoud Abdelazim · Ammar Altantawy ·
-Mostafa Ahmed · Nazanin Moradi · Raphael Maringgele
-
-Supervisor: **Prof. Dr. Jens Lauterbach**
 Technische Hochschule Augsburg · Faculty of Computer Science · SS 2026
