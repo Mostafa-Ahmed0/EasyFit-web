@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EasyFit — Snap a photo. Track your nutrition.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* ===========================================================
+     EasyFit — soft, friendly, student-focused
+     Palette: warm off-white paper, leafy green, soft sky, ink
+     Display: Fraunces (rounded, optical) · Body: Plus Jakarta Sans
+     Signature: the dashboard "calorie ring" filling on load,
+     echoed as a recurring motif (step bubbles, section marks)
+     =========================================================== */
+
+  :root {
+    --paper:   #FBF7F0;
+    --paper-2: #F4EEE3;
+    --card:    #FFFFFF;
+    --ink:     #21302A;
+    --ink-soft:#5A6B62;
+    --green:   #3DBE6E;
+    --green-d: #2E9E59;
+    --green-deep:#1F6E3E;
+    --sky:     #BFE3D6;
+    --peach:   #FFD9B8;
+    --ring-track: #E6E0D4;
+    --line:    #E7E0D2;
+    --shadow:  0 18px 40px -22px rgba(31,110,62,.35);
+    --shadow-sm: 0 8px 22px -16px rgba(33,48,42,.45);
+  }
+
+  * { box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+    color: var(--ink);
+    background: var(--paper);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+    html { scroll-behavior: auto; }
+  }
+
+  h1, h2, h3 {
+    font-family: "Fraunces", Georgia, serif;
+    font-weight: 600;
+    line-height: 1.08;
+    letter-spacing: -0.01em;
+    margin: 0;
+  }
+
+  p { margin: 0; }
+
+  a { color: inherit; }
+
+  .wrap {
+    width: min(1120px, 92vw);
+    margin-inline: auto;
+  }
+
+  .eyebrow {
+    font-size: .8rem;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--green-deep);
+    display: inline-flex;
+    align-items: center;
+    gap: .55em;
+  }
+  .eyebrow::before {
+    content: "";
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    border: 3px solid var(--green);
+    border-right-color: var(--sky);
+    flex: none;
+  }
+
+  /* ---------- top bar ---------- */
+  header {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(251,247,240,.82);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+  .nav {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 0;
+  }
+  .brand { display: flex; align-items: center; gap: 11px; font-weight: 700; }
+  .brand .glyph {
+    width: 34px; height: 34px; border-radius: 11px;
+    background: linear-gradient(150deg, var(--green), var(--green-deep));
+    display: grid; place-items: center;
+    color: #fff; font-family: "Fraunces", serif; font-size: 1.25rem; font-weight: 700;
+    box-shadow: var(--shadow-sm);
+  }
+  .brand .name { font-size: 1.18rem; letter-spacing: -.02em; }
+  .nav-links { display: flex; gap: 28px; font-size: .94rem; font-weight: 500; }
+  .nav-links a { color: var(--ink-soft); text-decoration: none; transition: color .2s; }
+  .nav-links a:hover { color: var(--green-deep); }
+  .nav-cta {
+    background: var(--ink); color: var(--paper);
+    padding: 10px 18px; border-radius: 999px;
+    text-decoration: none; font-weight: 600; font-size: .92rem;
+    transition: transform .2s, background .2s;
+  }
+  .nav-cta:hover { transform: translateY(-1px); background: var(--green-deep); }
+  @media (max-width: 720px) { .nav-links { display: none; } }
+
+  /* ---------- hero ---------- */
+  .hero { padding: 64px 0 40px; position: relative; overflow: hidden; }
+  .hero-grid {
+    display: grid; grid-template-columns: 1.05fr .95fr;
+    gap: 56px; align-items: center;
+  }
+  .hero h1 {
+    font-size: clamp(2.6rem, 5.6vw, 4.1rem);
+    margin-bottom: 20px;
+  }
+  .hero h1 em { font-style: italic; color: var(--green-deep); }
+  .hero-sub {
+    font-size: 1.18rem; color: var(--ink-soft);
+    max-width: 30ch; margin-bottom: 30px;
+  }
+  .hero-actions { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: var(--green-d); color: #fff;
+    padding: 15px 26px; border-radius: 999px;
+    font-weight: 700; font-size: 1.02rem; text-decoration: none;
+    box-shadow: var(--shadow); border: none; cursor: pointer;
+    transition: transform .2s, box-shadow .2s;
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 22px 46px -20px rgba(31,110,62,.5); }
+  .btn-primary svg { width: 20px; height: 20px; }
+  .btn-ghost {
+    display: inline-flex; align-items: center; gap: 8px;
+    color: var(--ink); font-weight: 600; text-decoration: none;
+    padding: 14px 8px;
+  }
+  .btn-ghost:hover { color: var(--green-deep); }
+  .hero-note { margin-top: 16px; font-size: .86rem; color: var(--ink-soft); }
+  .hero-note b { color: var(--ink); }
+
+  /* phone mock */
+  .phone-stage { position: relative; display: grid; place-items: center; }
+  .blob {
+    position: absolute; inset: -10% -6% -6% -6%;
+    background:
+      radial-gradient(60% 50% at 70% 20%, var(--sky), transparent 70%),
+      radial-gradient(55% 45% at 25% 80%, var(--peach), transparent 70%);
+    filter: blur(6px); z-index: 0; opacity: .8;
+  }
+  .phone {
+    position: relative; z-index: 1;
+    width: 270px; background: #10221A;
+    border-radius: 38px; padding: 8px;
+    box-shadow: 0 40px 80px -30px rgba(31,110,62,.55), 0 0 0 2px rgba(255,255,255,.04) inset;
+  }
+  .phone-shot {
+    display: block; width: 100%; border-radius: 28px;
+  }
+  .ps-top { display: flex; justify-content: space-between; font-size: .72rem; color: var(--ink-soft); margin-bottom: 14px; }
+  .ps-greet { font-family: "Fraunces", serif; font-size: 1.05rem; font-weight: 600; margin-bottom: 4px; }
+  .ps-greet span { color: var(--green-deep); }
+  .ps-sub { font-size: .76rem; color: var(--ink-soft); margin-bottom: 16px; }
+
+  .ring-wrap { display: grid; place-items: center; margin: 6px 0 18px; }
+  .ring { transform: rotate(-90deg); }
+  .ring-bg { fill: none; stroke: var(--ring-track); stroke-width: 13; }
+  .ring-fg {
+    fill: none; stroke: url(#ringGrad); stroke-width: 13; stroke-linecap: round;
+    stroke-dasharray: 339.292; stroke-dashoffset: 339.292;
+    animation: fillRing 1.8s cubic-bezier(.4,0,.1,1) .4s forwards;
+  }
+  @keyframes fillRing { to { stroke-dashoffset: 95; } }
+  .ring-label { position: absolute; text-align: center; }
+  .ring-num { font-family: "Fraunces", serif; font-size: 1.7rem; font-weight: 700; color: var(--ink); line-height: 1; }
+  .ring-unit { font-size: .68rem; color: var(--ink-soft); letter-spacing: .04em; }
+
+  .macros { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
+  .macro { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 9px 6px; text-align: center; }
+  .macro .v { font-weight: 700; font-size: .92rem; }
+  .macro .k { font-size: .64rem; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .06em; }
+  .macro.p .v { color: #E0734A; }
+  .macro.c .v { color: #C9A227; }
+  .macro.f .v { color: var(--green-d); }
+
+  @media (max-width: 880px) {
+    .hero { padding: 44px 0 24px; }
+    .hero-grid { grid-template-columns: 1fr; gap: 36px; }
+    .hero-sub { max-width: none; }
+    .phone-stage { order: -1; }
+  }
+
+  /* ---------- shared section ---------- */
+  section { padding: 72px 0; }
+  .sec-head { max-width: 56ch; margin-bottom: 42px; }
+  .sec-head h2 { font-size: clamp(1.9rem, 3.6vw, 2.7rem); margin: 14px 0 12px; }
+  .sec-head p { color: var(--ink-soft); font-size: 1.05rem; }
+
+  /* problem -> solution */
+  .ps {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 24px;
+  }
+  .panel {
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: 22px; padding: 32px; box-shadow: var(--shadow-sm);
+  }
+  .panel h3 { font-size: 1.4rem; margin-bottom: 18px; }
+  .panel.problem { background: var(--paper-2); border-color: #E7DDC9; box-shadow: none; }
+  .ck { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+  .ck li { display: flex; gap: 12px; align-items: flex-start; font-size: .98rem; }
+  .ck .mark { flex: none; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; margin-top: 1px; }
+  .problem .mark { background: #F1D9CE; color: #C0532E; }
+  .solution .mark { background: #D6F0DF; color: var(--green-deep); }
+  .ck .mark svg { width: 13px; height: 13px; }
+  @media (max-width: 760px) { .ps { grid-template-columns: 1fr; } }
+
+  /* how it works — the ring motif as steps */
+  .steps { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; }
+  .step { background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 24px 18px; box-shadow: var(--shadow-sm); position: relative; }
+  .step .bub {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: radial-gradient(circle at 30% 25%, var(--sky), var(--green) 120%);
+    color: var(--green-deep); display: grid; place-items: center;
+    font-family: "Fraunces", serif; font-weight: 700; font-size: 1.25rem;
+    margin-bottom: 16px; box-shadow: inset 0 0 0 2px rgba(255,255,255,.4);
+  }
+  .step h4 { font-family: "Fraunces", serif; font-size: 1.12rem; margin: 0 0 6px; }
+  .step p { font-size: .85rem; color: var(--ink-soft); }
+  @media (max-width: 920px) { .steps { grid-template-columns: repeat(2,1fr); } }
+  @media (max-width: 480px) { .steps { grid-template-columns: 1fr; } }
+
+  /* features */
+  .feat-band { background: var(--paper-2); border-block: 1px solid var(--line); }
+  .features { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; }
+  .feature {
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: 20px; padding: 26px; transition: transform .2s, box-shadow .2s;
+  }
+  .feature:hover { transform: translateY(-4px); box-shadow: var(--shadow); }
+  .feature .ico {
+    width: 46px; height: 46px; border-radius: 13px;
+    background: linear-gradient(150deg, var(--sky), #fff);
+    display: grid; place-items: center; margin-bottom: 16px;
+    border: 1px solid var(--line);
+  }
+  .feature .ico svg { width: 23px; height: 23px; stroke: var(--green-deep); }
+  .feature h4 { font-family: "Fraunces", serif; font-size: 1.16rem; margin-bottom: 8px; }
+  .feature p { font-size: .92rem; color: var(--ink-soft); }
+  @media (max-width: 880px) { .features { grid-template-columns: repeat(2,1fr); } }
+  @media (max-width: 560px) { .features { grid-template-columns: 1fr; } }
+
+  /* numbers */
+  .nums { display: grid; grid-template-columns: repeat(6,1fr); gap: 16px; }
+  .num { text-align: center; padding: 22px 8px; }
+  .num .v { font-family: "Fraunces", serif; font-size: clamp(1.8rem,3vw,2.5rem); font-weight: 700; color: var(--green-deep); }
+  .num .k { font-size: .78rem; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .06em; margin-top: 4px; }
+  @media (max-width: 760px) { .nums { grid-template-columns: repeat(3,1fr); } }
+
+  /* download */
+  .download { text-align: center; }
+  .dl-card {
+    background: linear-gradient(160deg, var(--green-deep), #155233);
+    color: var(--paper); border-radius: 30px; padding: 56px 40px;
+    position: relative; overflow: hidden; box-shadow: var(--shadow);
+  }
+  .dl-card::after {
+    content: ""; position: absolute; right: -60px; bottom: -80px;
+    width: 260px; height: 260px; border-radius: 50%;
+    border: 30px solid rgba(255,255,255,.06);
+  }
+  .dl-card h2 { color: #fff; font-size: clamp(2rem,4vw,2.8rem); margin-bottom: 14px; position: relative; }
+  .dl-card p { color: rgba(255,255,255,.82); max-width: 46ch; margin: 0 auto 28px; position: relative; }
+  .dl-actions { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; position: relative; }
+  .dl-btn {
+    display: inline-flex; align-items: center; gap: 12px;
+    background: var(--paper); color: var(--ink);
+    padding: 16px 26px; border-radius: 16px; text-decoration: none;
+    font-weight: 700; transition: transform .2s; text-align: left;
+  }
+  .dl-btn:hover { transform: translateY(-3px); }
+  .dl-btn small { display: block; font-weight: 500; font-size: .72rem; color: var(--ink-soft); }
+  .dl-btn b { font-size: 1.02rem; }
+  .dl-btn svg { width: 26px; height: 26px; flex: none; }
+  .dl-btn.ios { background: rgba(255,255,255,.12); color: #fff; }
+  .dl-btn.ios small { color: rgba(255,255,255,.7); }
+  .dl-fine { margin-top: 22px; font-size: .82rem; color: rgba(255,255,255,.7); position: relative; }
+  .dl-fine a { color: #fff; }
+
+  /* footer */
+  footer { padding: 56px 0 40px; border-top: 1px solid var(--line); }
+  .foot-grid { display: flex; justify-content: space-between; gap: 30px; flex-wrap: wrap; align-items: flex-start; }
+  .foot-team { max-width: 52ch; }
+  .foot-team .lab { font-size: .78rem; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 10px; }
+  .foot-team .names { font-size: .95rem; color: var(--ink); line-height: 1.9; }
+  .foot-meta { font-size: .85rem; color: var(--ink-soft); text-align: right; }
+  .foot-meta b { color: var(--ink); display: block; font-family: "Fraunces", serif; font-size: 1rem; }
+  @media (max-width: 620px) { .foot-meta { text-align: left; } }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <div class="brand">
+      <div class="glyph">E</div>
+      <span class="name">EasyFit</span>
+    </div>
+    <nav class="nav-links">
+      <a href="#how">How it works</a>
+      <a href="#features">Features</a>
+      <a href="#numbers">The project</a>
+    </nav>
+    <a href="#download" class="nav-cta">Get the app</a>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <span class="eyebrow">TH Augsburg · Project Day 2026</span>
+      <h1 style="margin-top:18px;">Tracking food shouldn't feel like a <em>second job.</em></h1>
+      <p class="hero-sub">Snap a photo of your meal — EasyFit's AI works out what it is and what's in it. Mensa meals log in two taps.</p>
+      <div class="hero-actions">
+        <a href="#download" class="btn-primary">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16"/></svg>
+          Download for Android
+        </a>
+        <a href="#how" class="btn-ghost">See how it works →</a>
+      </div>
+      <p class="hero-note"><b>Not on the Play Store yet</b> — install the APK directly while we're in beta.</p>
+    </div>
+
+    <div class="phone-stage">
+      <div class="blob"></div>
+      <div class="phone">
+        <img class="phone-shot" src="easyfit-screenshot.jpg" alt="EasyFit dashboard showing today's calorie target, daily ring and meal breakdown">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEM / SOLUTION -->
+<section>
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Why we built it</span>
+      <h2>Most tracking apps ask too much. We ask for a photo.</h2>
+      <p>Students eat at the Mensa every day with no idea what's on their plate — and the apps that could help take so many taps that most people quit within a week.</p>
+    </div>
+    <div class="ps">
+      <div class="panel problem">
+        <h3>The old way</h3>
+        <ul class="ck">
+          <li><span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></span>No idea what's actually in your Mensa meal</li>
+          <li><span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></span>Too many steps — people give up in days</li>
+          <li><span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></span>Generic goals that ignore your body</li>
+          <li><span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></span>No guidance on what to eat next</li>
+        </ul>
+      </div>
+      <div class="panel solution">
+        <h3>The EasyFit way</h3>
+        <ul class="ck">
+          <li><span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg></span>A calorie goal built from your own metrics</li>
+          <li><span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg></span>Log any meal by photo — AI does the rest</li>
+          <li><span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg></span>TH Augsburg Mensa menu, built in</li>
+          <li><span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg></span>Smart suggestions for your remaining budget</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how" style="padding-top:24px;">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Under 30 seconds</span>
+      <h2>From plate to progress in five steps</h2>
+    </div>
+    <div class="steps">
+      <div class="step"><div class="bub">1</div><h4>Capture</h4><p>Snap a photo, pick a Mensa meal, or enter food manually.</p></div>
+      <div class="step"><div class="bub">2</div><h4>Analyse</h4><p>AI identifies the food and estimates its nutrition.</p></div>
+      <div class="step"><div class="bub">3</div><h4>Confirm</h4><p>Review and tweak the detected items before saving.</p></div>
+      <div class="step"><div class="bub">4</div><h4>Save</h4><p>Your meal is stored securely in the cloud.</p></div>
+      <div class="step"><div class="bub">5</div><h4>Track</h4><p>Your daily ring and progress charts update instantly.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features" class="feat-band">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">What's inside</span>
+      <h2>Everything you need, nothing you don't</h2>
+    </div>
+    <div class="features">
+      <div class="feature">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h3l2-2h8l2 2h3v12H3z"/><circle cx="12" cy="13" r="3.5"/></svg></div>
+        <h4>AI meal scan</h4>
+        <p>Point your camera at a plate. The AI recognises the food and estimates portion sizes for you.</p>
+      </div>
+      <div class="feature">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v4H4zM6 8v12h12V8"/><path d="M9 12h6"/></svg></div>
+        <h4>Mensa integration</h4>
+        <p>The TH Augsburg cafeteria menu is updated daily, so a campus lunch logs in just two taps.</p>
+      </div>
+      <div class="feature">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
+        <h4>Personal calorie goal</h4>
+        <p>A goal tailored to your age, weight, height and activity — recalculated whenever your stats change.</p>
+      </div>
+      <div class="feature">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5M4 19h16M8 16v-5M12 16V8M16 16v-3"/></svg></div>
+        <h4>Progress charts</h4>
+        <p>Watch calorie and macro trends across days, weeks, months and the whole year.</p>
+      </div>
+      <div class="feature">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.5 5 5.5.8-4 3.9 1 5.5L12 16l-5 2.6 1-5.5-4-3.9 5.5-.8z"/></svg></div>
+        <h4>Smart suggestions</h4>
+        <p>EasyFit recommends meals that fit the calories and macros you have left for the day.</p>
+      </div>
+      <div class="feature">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 5.6a5 5 0 00-8.8-1.6A5 5 0 003.2 5.6c-1.5 2.7.4 6 4 9.3L12 19l4.8-4.1c3.6-3.3 5.5-6.6 4-9.3z"/></svg></div>
+        <h4>Apple Health</h4>
+        <p>On iOS, EasyFit reads your activity and writes nutrition records straight to HealthKit.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- NUMBERS -->
+<section id="numbers">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">The project</span>
+      <h2>Built over six sprints by seven students</h2>
+      <p>A 4th-semester project at the Technische Hochschule Augsburg, Faculty of Computer Science.</p>
+    </div>
+    <div class="nums">
+      <div class="num"><div class="v">7</div><div class="k">Team members</div></div>
+      <div class="num"><div class="v">6</div><div class="k">Sprints</div></div>
+      <div class="num"><div class="v">181</div><div class="k">Food items</div></div>
+      <div class="num"><div class="v">4</div><div class="k">Cloud functions</div></div>
+      <div class="num"><div class="v">2</div><div class="k">Platforms</div></div>
+      <div class="num"><div class="v">&lt;30s</div><div class="k">To log a meal</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- DOWNLOAD -->
+<section id="download">
+  <div class="wrap">
+    <div class="dl-card">
+      <h2>Try EasyFit today</h2>
+      <p>We're not on the Play Store just yet. Grab the Android APK below and install it directly — it takes a minute.</p>
+      <div class="dl-actions">
+        <!-- ▼▼▼ REPLACE href WITH YOUR APK LINK ▼▼▼ -->
+        <a href="REPLACE_WITH_APK_URL" class="dl-btn" download>
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.6 9.5l1.5-2.6a.3.3 0 00-.5-.3l-1.5 2.6A8.9 8.9 0 0012 8c-1.8 0-3.5.4-5 1.2L5.4 6.6a.3.3 0 00-.5.3l1.5 2.6C3.7 11.2 2 14 2 17h20c0-3-1.7-5.8-4.4-7.5zM7.5 14.5a1 1 0 110-2 1 1 0 010 2zm9 0a1 1 0 110-2 1 1 0 010 2z"/></svg>
+          <span><small>Direct download · ~30 MB</small><b>Android APK</b></span>
+        </a>
+        <a href="REPLACE_WITH_TESTFLIGHT_URL" class="dl-btn ios">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.5 1.5c.1 1.2-.4 2.3-1.1 3.1-.8.9-2 1.5-3.1 1.4-.1-1.1.4-2.3 1.1-3 .8-.9 2-1.5 3.1-1.5zM20 17.3c-.5 1.2-.8 1.8-1.5 2.9-1 1.5-2.4 3.4-4.1 3.4-1.5 0-1.9-1-4-1-2 0-2.5 1-4 1-1.7 0-3-1.7-4-3.2C-.4 17-.1 11.2 3 9c1-.7 2.1-1 3.1-1 1.6 0 2.6 1 4 1 1.3 0 2-1 4-1 1 0 2.6.3 3.7 1.5-3.2 1.8-2.7 6.3 2.2 7.8z"/></svg>
+          <span><small>Coming soon · iOS beta</small><b>TestFlight</b></span>
+        </a>
+      </div>
+      <p class="dl-fine">Android may warn about installing apps from outside the Play Store — that's expected for a direct APK. Tap <b>Install anyway</b> to continue. Questions? <a href="mailto:REPLACE_WITH_EMAIL">Reach the team</a>.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap foot-grid">
+    <div class="foot-team">
+      <div class="lab">The team</div>
+      <div class="names">Ahmed Somida · Yousif Abdelaziz · Mahmoud Abdelazim · Ammar Altantawy · Mostafa Ahmed · Nazanin Moradi · Raphael Maringgele</div>
+    </div>
+    <div class="foot-meta">
+      <b>Prof. Dr. Jens Lauterbach</b>
+      Supervisor
+      <br><br>
+      Technische Hochschule Augsburg<br>
+      Faculty of Computer Science · SS 2026
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
