@@ -245,6 +245,52 @@
   @media (max-width:520px) {
     .member { width:100%; max-width:300px; justify-content:flex-start; }
   }
+
+  /* waitlist section */
+  .waitlist-band { background:var(--paper-2); border-block:1px solid var(--line); }
+  .waitlist-inner {
+    display:grid; grid-template-columns:1fr 1fr; gap:56px; align-items:center;
+  }
+  .waitlist-copy h2 { font-size:clamp(1.9rem,3.4vw,2.6rem); margin:14px 0 12px; }
+  .waitlist-copy p  { color:var(--ink-soft); font-size:1.05rem; max-width:38ch; }
+  .waitlist-form-wrap { background:var(--card); border:1px solid var(--line); border-radius:24px; padding:34px; box-shadow:var(--shadow-sm); }
+  .wl-row {
+    display:flex; gap:10px;
+  }
+  .wl-input {
+    flex:1; padding:13px 18px; border:1.5px solid var(--line); border-radius:999px;
+    font-family:inherit; font-size:.98rem; color:var(--ink); background:var(--paper);
+    outline:none; transition:border-color .2s;
+  }
+  .wl-input:focus  { border-color:var(--green-d); }
+  .wl-input::placeholder { color:var(--ink-soft); }
+  .wl-btn {
+    padding:13px 22px; background:var(--green-d); color:#fff; border:none;
+    border-radius:999px; font-family:inherit; font-weight:700; font-size:.96rem;
+    cursor:pointer; white-space:nowrap; transition:transform .2s, box-shadow .2s;
+    box-shadow:var(--shadow-sm);
+  }
+  .wl-btn:hover   { transform:translateY(-2px); box-shadow:var(--shadow); }
+  .wl-btn:disabled { opacity:.55; cursor:default; transform:none; }
+  .wl-msg {
+    margin-top:14px; font-size:.88rem; min-height:1.4em;
+    display:flex; align-items:center; gap:8px;
+  }
+  .wl-msg.ok   { color:var(--green-deep); }
+  .wl-msg.err  { color:#C0532E; }
+  .wl-count {
+    margin-top:18px; padding-top:18px; border-top:1px solid var(--line);
+    font-size:.82rem; color:var(--ink-soft); display:flex; align-items:center; gap:6px;
+  }
+  .wl-count b { color:var(--green-deep); }
+  @media (max-width:800px) {
+    .waitlist-inner { grid-template-columns:1fr; gap:28px; }
+    .waitlist-copy p { max-width:none; }
+  }
+  @media (max-width:480px) {
+    .wl-row { flex-direction:column; }
+    .wl-btn { border-radius:999px; }
+  }
 </style>
 </head>
 <body>
@@ -260,6 +306,7 @@
         <a href="#how" data-i18n="nav.how">So funktioniert's</a>
         <a href="#features" data-i18n="nav.features">Funktionen</a>
         <a href="#numbers" data-i18n="nav.project">Das Projekt</a>
+        <a href="#waitlist" data-i18n="nav.waitlist">Warteliste</a>
       </nav>
       <div class="lang" role="group" aria-label="Language / Sprache">
         <button type="button" data-lang="de">DE</button>
@@ -426,6 +473,26 @@
   </div>
 </section>
 
+<!-- WAITLIST -->
+<section id="waitlist" class="waitlist-band">
+  <div class="wrap">
+    <div class="waitlist-inner">
+      <div class="waitlist-copy">
+        <span class="eyebrow" data-i18n="wl.eyebrow">iOS kommt bald</span>
+        <h2 data-i18n="wl.title">Sei dabei, wenn EasyFit auf iOS startet.</h2>
+        <p data-i18n="wl.sub">Trag dich in die Warteliste ein — wir schreiben dir, sobald die iOS-Beta verfügbar ist. Kein Spam, versprochen.</p>
+      </div>
+      <div class="waitlist-form-wrap">
+        <div class="wl-row">
+          <input id="wl-email" class="wl-input" type="email" data-i18n-placeholder="wl.placeholder" placeholder="deine@email.de" autocomplete="email">
+          <button id="wl-submit" class="wl-btn" data-i18n="wl.btn">Eintragen</button>
+        </div>
+        <div id="wl-msg" class="wl-msg" aria-live="polite"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- FOOTER -->
 <footer>
   <div class="wrap foot-inner">
@@ -497,7 +564,17 @@
       "dl.androidSmall": "Direkter Download · ~55 MB", "dl.androidBig": "Android APK",
       "dl.iosSmall": "Bald · iOS Beta", "dl.iosBig": "TestFlight",
       "dl.fine": "Android warnt eventuell vor der Installation von Apps außerhalb des Play Store — das ist bei einer direkten APK normal. Tippe auf <b>Trotzdem installieren</b>. Fragen? <a href=\"mailto:easyfit7422@gmail.com\">Schreib dem Team</a>.",
-      "foot.teamLab": "Das Team", "foot.headline": "Sieben Studierende, sechs Sprints, eine App.", "foot.supervisor": "Betreut von", "foot.faculty": "Fakultät Informatik · SS 2026"
+      "foot.teamLab": "Das Team", "foot.headline": "Sieben Studierende, sechs Sprints, eine App.", "foot.supervisor": "Betreut von", "foot.faculty": "Fakultät Informatik · SS 2026",
+      "nav.waitlist": "Warteliste",
+      "wl.eyebrow": "iOS kommt bald",
+      "wl.title": "Sei dabei, wenn EasyFit auf iOS startet.",
+      "wl.sub": "Trag dich in die Warteliste ein — wir schreiben dir, sobald die iOS-Beta verfügbar ist. Kein Spam, versprochen.",
+      "wl.placeholder": "deine@email.de",
+      "wl.btn": "Eintragen",
+      "wl.ok": "✓ Eingetragen! Wir melden uns.",
+      "wl.duplicate": "Diese E-Mail ist bereits eingetragen.",
+      "wl.invalid": "Bitte gib eine gültige E-Mail-Adresse ein.",
+      "wl.count": "bereits eingetragen"
     },
     en: {
       "meta.title": "EasyFit — Snap a photo. Track your nutrition.",
@@ -544,7 +621,17 @@
       "dl.androidSmall": "Direct download · ~55 MB", "dl.androidBig": "Android APK",
       "dl.iosSmall": "Coming soon · iOS beta", "dl.iosBig": "TestFlight",
       "dl.fine": "Android may warn about installing apps from outside the Play Store — that's expected for a direct APK. Tap <b>Install anyway</b> to continue. Questions? <a href=\"mailto:easyfit7422@gmail.com\">Reach the team</a>.",
-      "foot.teamLab": "The team", "foot.headline": "Seven students, six sprints, one app.", "foot.supervisor": "Supervised by", "foot.faculty": "Faculty of Computer Science · SS 2026"
+      "foot.teamLab": "The team", "foot.headline": "Seven students, six sprints, one app.", "foot.supervisor": "Supervised by", "foot.faculty": "Faculty of Computer Science · SS 2026",
+      "nav.waitlist": "Waitlist",
+      "wl.eyebrow": "iOS coming soon",
+      "wl.title": "Be first when EasyFit launches on iOS.",
+      "wl.sub": "Join the waitlist — we'll reach out as soon as the iOS beta is ready. No spam, ever.",
+      "wl.placeholder": "your@email.com",
+      "wl.btn": "Join",
+      "wl.ok": "✓ You're in! We'll be in touch.",
+      "wl.duplicate": "That email is already on the list.",
+      "wl.invalid": "Please enter a valid email address.",
+      "wl.count": "already signed up"
     }
   };
 
@@ -558,6 +645,10 @@
     document.querySelectorAll("[data-i18n-html]").forEach(function (el) {
       const k = el.getAttribute("data-i18n-html");
       if (dict[k] != null) el.innerHTML = dict[k];
+    });
+    document.querySelectorAll("[data-i18n-placeholder]").forEach(function (el) {
+      const k = el.getAttribute("data-i18n-placeholder");
+      if (dict[k] != null) el.placeholder = dict[k];
     });
     if (dict["meta.title"]) document.title = dict["meta.title"];
     document.querySelectorAll(".lang button").forEach(function (b) {
@@ -581,6 +672,58 @@
   });
 
   applyLang(initialLang());
+
+  /* ── Waitlist → Formspree ── */
+  var WL_ENDPOINT = "https://formspree.io/f/xvzjgzep";
+
+  function wlSubmit() {
+    var lang = document.documentElement.lang;
+    var dict = I18N[lang] || I18N.de;
+    var input   = document.getElementById("wl-email");
+    var btn     = document.getElementById("wl-submit");
+    var msgEl   = document.getElementById("wl-msg");
+    var email   = input.value.trim().toLowerCase();
+
+    msgEl.className = "wl-msg";
+    msgEl.textContent = "";
+
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      msgEl.className = "wl-msg err";
+      msgEl.textContent = dict["wl.invalid"];
+      input.focus();
+      return;
+    }
+
+    btn.disabled = true;
+
+    fetch(WL_ENDPOINT, {
+      method: "POST",
+      headers: { "Accept": "application/json", "Content-Type": "application/json" },
+      body: JSON.stringify({ email: email })
+    })
+    .then(function(res) { return res.json().then(function(data) { return { ok: res.ok, data: data }; }); })
+    .then(function(result) {
+      btn.disabled = false;
+      if (result.ok) {
+        input.value = "";
+        msgEl.className = "wl-msg ok";
+        msgEl.textContent = dict["wl.ok"];
+      } else {
+        msgEl.className = "wl-msg err";
+        msgEl.textContent = (result.data && result.data.error) ? result.data.error : "Something went wrong. Please try again.";
+      }
+    })
+    .catch(function() {
+      btn.disabled = false;
+      msgEl.className = "wl-msg err";
+      msgEl.textContent = "Network error. Please try again.";
+    });
+  }
+
+  document.getElementById("wl-submit").addEventListener("click", wlSubmit);
+  document.getElementById("wl-email").addEventListener("keydown", function(e) {
+    if (e.key === "Enter") wlSubmit();
+  });
 </script>
 
 </body>
